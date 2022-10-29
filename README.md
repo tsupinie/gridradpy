@@ -1,5 +1,5 @@
 ## gridradpy
-A Python module for loading and QC-ing GridRad-Severe data (http://gridrad.org/index.html). This is based off the Python scripts available at http://gridrad.org/software.html. It has the same functions, but written using xarray.
+A Python module for loading and QC-ing GridRad-Severe data (http://gridrad.org/index.html). `gridradpy` is based off the Python scripts available at http://gridrad.org/software.html. It has the same functions, but written using xarray. It also includes a download script that requires a free account at UCAR's [Research Data Archive](https://rda.ucar.edu/).
 
 ### Installation
 ```bash
@@ -12,6 +12,22 @@ python setup.py install
 ```
 
 ### Usage
+To use the download script:
+```
+usage: download_gridrad [-h] --email EMAIL --dt-start DT_START --dt-end DT_END [--td-step TD_STEP] [--out-path OUT_PATH] [--force-download]
+
+options:
+  -h, --help           show this help message and exit
+  --email EMAIL        Email address to use for authentication in the UCAR RDA
+  --dt-start DT_START  Start time for data download (YYYYMMDD_HHMM format)
+  --dt-end DT_END      End time for data download (YYYYMMDD_HHMM format)
+  --td-step TD_STEP    Time step for data download (ISO 8601 format; defaults to 'PT5M', or 5 minutes)
+  --out-path OUT_PATH  Path to download data to (defaults to the current directory)
+  --force-download     If specified, overwrite files already downloaded; otherwise, skip previously downloaded files
+```
+The download script will prompt for your RDA password when run.
+
+To use the Python processing code:
 ```python
 >>> import gridradpy
 >>> data = gridradpy.read_file('/path/to/file.nc')                  # Read the gridrad file and unpack it from the 
