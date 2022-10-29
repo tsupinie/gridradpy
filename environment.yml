@@ -1,0 +1,8 @@
+name: gridradpy
+channels:
+  - defaults
+dependencies:
+  - bottleneck
+  - xarray
+  - matplotlib
+  - netcdf4
