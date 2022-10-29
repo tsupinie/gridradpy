@@ -1,0 +1,120 @@
+
+import urllib.request as urlreq
+import urllib.error as urlerr
+import http.cookiejar
+import getpass
+import argparse
+from pathlib import Path
+import shutil
+from datetime import datetime, timedelta
+import re
+
+def iter_dt(dt_start, dt_stop, td_step):
+    dt = dt_start
+    while dt <= dt_stop:
+        yield dt
+        dt = dt + td_step
+
+def download_files(args, opener, verbose=True):
+    #
+    # download the data file(s)
+
+    for dt in iter_dt(args.dt_start, args.dt_end, args.td_step):
+        conv_dt = dt - timedelta(hours=12)
+        file = f"volumes/{conv_dt:%Y}/{conv_dt:%Y%m%d}/nexrad_3d_v4_2_{dt:%Y%m%dT%H%M%S}Z.nc"
+        ofile = args.out_path / Path(file).name
+
+        if ofile.exists() and not args.force:
+            continue
+        
+        if verbose:
+            print(f"Downloading {ofile} ... ", end="", flush=True)
+
+        rem_fname = f"http://rda.ucar.edu/data/OS/ds841.6/{file}"
+
+        try:
+            frem = opener.open(rem_fname)
+        except urlerr.HTTPError:
+            if verbose:
+                print("not found.")
+
+            continue
+
+        with open(ofile, 'wb') as floc:
+            shutil.copyfileobj(frem, floc)
+
+        if verbose:
+            print("done.")
+
+def login(cookiejar, opener, email, auth_path=Path('.')):    
+    # check for existing cookies file and authenticate if necessary
+    do_authentication = False
+
+    auth_file = auth_path / 'auth.rda.ucar.edu'
+    if auth_file.exists():
+        cookiejar.load(auth_file, False, True)
+
+    for cookie in cookiejar:
+        if (cookie.name == "sess" and cookie.is_expired()):
+            do_authentication=True
+    else:
+        do_authentication=True
+
+    if do_authentication:
+        passwd = getpass.getpass(prompt="Enter RDA Password: ")
+        login = opener.open("https://rda.ucar.edu/cgi-bin/login", f"email={email}&password={passwd}&action=login".encode('utf-8'))
+
+    #
+    # save the authentication cookies for future downloads
+    # NOTE! - cookies are saved for future sessions because overly-frequent authentication to our server can cause your data access to be blocked
+    cookiejar.clear_session_cookies()
+    cookiejar.save(auth_file, True, True)
+    
+
+def main():
+    def parse_datetime(dt_str):
+        return datetime.strptime(dt_str, '%Y%m%d_%H%M')
+
+    def parse_timedelta(td_str):
+        periods = ['years', 'months', 'days', 'hours', 'minutes', 'seconds']
+        match = re.match('P(?:([\d.]+)Y)?(?:([\d.]+)M)?(?:([\d.]+)D)?(?:T(?:([\d.]+)H)?(?:([\d.]+)M)?(?:([\d.]+)S)?)?', td_str)
+
+        try:
+            dct = {p: int(n) if n is not None else 0 for p, n in zip(periods, match.groups())}
+        except AttributeError:
+            raise ValueError(f"Could not parse '{td_str}' as a timedelta")
+
+        dct['days'] += 365 * dct.pop('years')
+        dct['days'] += 30 * dct.pop('months')
+
+        return timedelta(**dct)
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--email', dest='email', required=True, 
+                    help="Email address to use for authentication in the UCAR RDA")
+    ap.add_argument('--dt-start', dest='dt_start', type=parse_datetime, required=True, 
+                    help="Start time for data download (YYYYMMDD_HHMM format)")
+    ap.add_argument('--dt-end', dest='dt_end', type=parse_datetime, required=True, 
+                    help="End time for data download (YYYYMMDD_HHMM format)")
+    ap.add_argument('--td-step', dest='td_step', type=parse_timedelta, default=timedelta(minutes=5), 
+                    help="Time step for data download (ISO 8601 format; defaults to 'PT5M', or 5 minutes)")
+    ap.add_argument('--out-path', dest='out_path', type=Path, default=Path('.'),
+                    help="Path to download data to (defaults to the current directory)")
+    ap.add_argument('--force-download', dest='force', action='store_true',
+                    help="If specified, overwrite files already downloaded; otherwise, skip previously downloaded files")
+
+    args = ap.parse_args()
+
+    cj=http.cookiejar.MozillaCookieJar()
+    opener=urlreq.build_opener(urlreq.HTTPCookieProcessor(cj))
+
+    login(cj, opener, args.email, auth_path=args.out_path)
+    try:
+        download_files(args, opener)
+    except:
+        print()
+        raise
+
+
+if __name__ == '__main__':
+    main()
