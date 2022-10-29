@@ -8,10 +8,6 @@
 #		Cameron R. Homeyer  2017-07-03.
 #                         2021-02-23. Updated to be compatible with v4.2 GridRad data and v3 Python.
 #       Tim Supinie 2022-10-28. Updated to use xarray
-# Warning:
-#		The authors' primary coding language is not Python. This code works, but may not be
-#      the most efficient or proper approach. Please suggest improvements by sending an email
-#		 to chomeyer@ou.edu.
 #-
 
 import numpy as np
