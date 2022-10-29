@@ -132,12 +132,13 @@ def remove_clutter(ds, skip_weak_ll_echo=False, areal_coverage_thresh=0.32):
         clutter = clutter | col_mask
 
     # Find clutter below convective anvils
-    # TAS: The original code cuts off the topmost horizontal slice of the domain. I'm guessing that's not correct.
+    # TAS: The original code cuts off the topmost horizontal slice of the above- and below-4-km layers. I'm guessing 
+    #   that's not correct.
     alt_cutoff = 4.
     has_refl_data = ~ds['Reflectivity'].where(~clutter).isnull()
     anvil_clutter = ((has_refl_data.sel(Altitude=alt_cutoff) == False) & 
-                     (has_refl_data.sel(Altitude=slice(None, alt_cutoff)).isel(Altitude=slice(0, -2)).sum(dim='Altitude') > 0) &
-                     (has_refl_data.sel(Altitude=slice(alt_cutoff, None)).isel(Altitude=slice(0, -1)).sum(dim='Altitude') > 0) &
+                     (has_refl_data.sel(Altitude=slice(None, alt_cutoff)).sum(dim='Altitude') > 0) &
+                     (has_refl_data.sel(Altitude=slice(alt_cutoff, None)).sum(dim='Altitude') > 0) &
                      (ds['Altitude'] <= alt_cutoff))
 
     clutter = clutter | anvil_clutter
