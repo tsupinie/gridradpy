@@ -1,20 +1,24 @@
 ## gridradpy
 A Python module for loading and QC-ing GridRad-Severe data (http://gridrad.org/index.html). This is based off the Python scripts available at http://gridrad.org/software.html. It has the same functions, but written using xarray.
 
-### Dependency Installation
+### Installation
 ```bash
+# Install dependencies
 conda env create -f environment.yml
 conda activate gridradpy
+
+# Install gridradpy
+python setup.py install
 ```
 
 ### Usage
 ```python
->>> import gridrad
->>> data = gridrad.read_file('/path/to/file.nc')                  # Read the gridrad file and unpack it from the 
-                                                                  #   sparse storage scheme
->>> data = gridrad.filter(data)                                   # Remove low-confidence data points
->>> data = gridrad.remove_clutter(data, skip_weak_ll_echo=True)   # Remove areas of ground clutter
->>> gridrad.plot_image(data, fname='gridrad_image.png')           # Plot a basic image, saving it to gridrad_image.png
+>>> import gridradpy
+>>> data = gridradpy.read_file('/path/to/file.nc')                  # Read the gridrad file and unpack it from the 
+                                                                    #   sparse storage scheme
+>>> data = gridradpy.filter(data)                                   # Remove low-confidence data points
+>>> data = gridradpy.remove_clutter(data, skip_weak_ll_echo=True)   # Remove areas of ground clutter
+>>> gridradpy.plot_image(data, fname='gridrad_image.png')           # Plot a basic image, saving it to gridrad_image.png
 ```
 
 ### Differences from the Original Code
