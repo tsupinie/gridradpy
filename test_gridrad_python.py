@@ -1,4 +1,4 @@
-import gridrad
+import gridradpy.gridrad as gridrad
 
 fname = '/Users/tsupinie/data/gridrad/nexrad_3d_v4_2_20110426T220000Z.nc'
 
