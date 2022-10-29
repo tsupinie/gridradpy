@@ -17,11 +17,14 @@ import xarray as xr
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+from pathlib import Path
+from typing import Union
+
 index_variables = ['Reflectivity', 'wReflectivity', 'SpectrumWidth', 'wSpectrumWidth', 'AzShear', 'wAzShear', 
                     'Divergence', 'wDivergence', 'DifferentialReflectivity', 'wDifferentialReflectivity',
                     'DifferentialPhase', 'wDifferentialPhase', 'CorrelationCoefficient', 'wCorrelationCoefficient']
 
-def read_file(infile):
+def read_file(infile: Union[str, Path]) -> xr.Dataset:
     ds = xr.open_dataset(infile)
 
     nlon = ds.dims['Longitude']
@@ -52,7 +55,7 @@ def read_file(infile):
 
 
 # GridRad filter routine
-def filter(ds, wthresh=1.5, freq_thresh=0.6, Z_H_thresh=15.0, nobs_thresh=2):
+def filter(ds: xr.Dataset, wthresh=1.5, freq_thresh=0.6, Z_H_thresh=15.0, nobs_thresh=2):
     """
     wthresh:        Bin weight threshold for filtering by year (dimensionless)
     freq_thresh:    Echo frequency threshold (dimensionless)
@@ -81,7 +84,7 @@ def filter(ds, wthresh=1.5, freq_thresh=0.6, Z_H_thresh=15.0, nobs_thresh=2):
     return ds
 
 # Gridrad clutter filter routine
-def remove_clutter(ds, skip_weak_ll_echo=False, areal_coverage_thresh=0.32):
+def remove_clutter(ds: xr.Dataset, skip_weak_ll_echo=False, areal_coverage_thresh=0.32) -> xr.Dataset:
     """
     areal_coverage_thresh:  Fractional areal coverage threshold for speckle identification
     """
@@ -159,7 +162,7 @@ def remove_clutter(ds, skip_weak_ll_echo=False, areal_coverage_thresh=0.32):
     return ds
 
 # GridRad sample image plotting routine
-def plot_image(ds, fname='gridrad_image.png'):
+def plot_image(ds: xr.Dataset, fname='gridrad_image.png') -> None:
     
     r = [ 49, 30, 15,150, 78, 15,255,217,255,198,255,109,255,255,255]		# RGB color values
     g = [239,141, 56,220,186, 97,222,164,107, 59,  0,  0,  0,171,255]
