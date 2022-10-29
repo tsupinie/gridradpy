@@ -33,6 +33,7 @@ def read_file(infile: Union[str, Path]) -> xr.Dataset:
 
     index = ds['index'].values
 
+    da_dict = {}
     for var in index_variables:
         if var not in ds.variables:
             continue
@@ -46,10 +47,9 @@ def read_file(infile: Union[str, Path]) -> xr.Dataset:
         da = xr.DataArray(data=values.reshape((nalt, nlat, nlon)), coords=ds['Nradobs'].coords, 
                           dims=ds['Nradobs'].dims, name=ds[var].name, attrs=ds[var].attrs)
 
-        da_dict = {}
         da_dict[var] = da
 
-        ds = ds.assign(**da_dict)
+    ds = ds.assign(**da_dict)
 
     return ds.drop_vars('index')
 
@@ -72,13 +72,14 @@ def filter(ds: xr.Dataset, wthresh=1.5, freq_thresh=0.6, Z_H_thresh=15.0, nobs_t
     
     # Remove low confidence observations
     if has_data.any():
+        da_dict = {}
         for var in index_variables:
             if var.startswith('w') or var not in ds.variables:
                 continue
             
-            da_dict = {}
             da_dict[var] = ds[var].where(mask)
-            ds = ds.assign(**da_dict)
+
+        ds = ds.assign(**da_dict)
     
     # Return filtered data0
     return ds
@@ -151,13 +152,14 @@ def remove_clutter(ds: xr.Dataset, skip_weak_ll_echo=False, areal_coverage_thres
     clutter = clutter | speckle
 
     # Remove the clutter from all variables
+    da_dict = {}
     for var in index_variables:
         if var.startswith('w') or var not in ds.variables:
             continue
         
-        da_dict = {}
         da_dict[var] = ds[var].where(~clutter)
-        ds = ds.assign(**da_dict)
+
+    ds = ds.assign(**da_dict)
     
     return ds
 
