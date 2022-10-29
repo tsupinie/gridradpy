@@ -6,3 +6,4 @@ dependencies:
   - xarray
   - matplotlib
   - netcdf4
+  - setuptools
