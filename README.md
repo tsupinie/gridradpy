@@ -1,5 +1,5 @@
 ## gridradpy
-A Python module for loading and QC-ing GridRad-Severe data (http://gridrad.org/index.html). `gridradpy` is based off the Python scripts available at http://gridrad.org/software.html. It has the same functions, but written using xarray. It also includes a download script that requires a free account at UCAR's [Research Data Archive](https://rda.ucar.edu/).
+A Python module for loading and QC-ing GridRad-Severe data (http://gridrad.org/index.html). `gridradpy` is based off the Python scripts available at http://gridrad.org/software.html. It has the same functions, but written using xarray. It also includes a download script that requires a free account on UCAR's [Research Data Archive (RDA)](https://rda.ucar.edu/).
 
 ### Installation
 ```bash
