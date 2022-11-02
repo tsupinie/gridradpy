@@ -8,6 +8,9 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Union
 
+class AuthenticationError(Exception):
+    pass
+
 class GridRadDownloader:
     def __init__(self):
         self._cj = http.cookiejar.MozillaCookieJar()
@@ -55,8 +58,22 @@ class GridRadDownloader:
             do_authentication=True
 
         if do_authentication:
-            passwd = getpass.getpass(prompt="Enter RDA Password: ")
-            login = self._opener.open("https://rda.ucar.edu/cgi-bin/login", f"email={email}&password={passwd}&action=login".encode('utf-8'))
+            success = False
+            max_tries = 3
+            n_tries = 0
+            while not success and n_tries < max_tries:
+                passwd = getpass.getpass(prompt="Enter RDA Password: ")
+                try:
+                    login = self._opener.open("https://rda.ucar.edu/cgi-bin/login", f"email={email}&password={passwd}&action=login".encode('utf-8'))
+                except urlerr.HTTPError:
+                    pass
+                else:
+                    success = True
+
+                n_tries += 1
+
+            if not success:
+                raise AuthenticationError(f'Unsuccessful login after {max_tries} attempts')
 
         #
         # save the authentication cookies for future downloads
