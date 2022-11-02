@@ -47,6 +47,42 @@ Enter RDA Password:
 >>> data = gridradpy.remove_clutter(data, skip_weak_ll_echo=True)   # Remove areas of ground clutter
 >>> data = gridradpy.load_and_process_file(local_fname)             # Shorthand that does the same thing the above 3 
                                                                     #   function calls
+>>> data
+<xarray.Dataset>
+Dimensions:         (Longitude: 792, Latitude: 792, Altitude: 29, Sweep: 1691,
+                     time: 1)
+Coordinates:
+  * Longitude       (Longitude) float64 267.5 267.5 267.6 ... 283.9 284.0 284.0
+  * Latitude        (Latitude) float64 27.51 27.53 27.55 ... 43.95 43.97 43.99
+  * Altitude        (Altitude) float64 0.5 1.0 1.5 2.0 ... 19.0 20.0 21.0 22.0
+  * time            (time) datetime64[ns] 2011-04-27T22:00:00
+Dimensions without coordinates: Sweep
+Data variables:
+    sweeps_merged   (Sweep) |S29 ...
+    Nradobs         (Altitude, Latitude, Longitude) int8 0 0 0 0 0 ... 4 3 1 1 3
+    Nradecho        (Altitude, Latitude, Longitude) int8 ...
+    Reflectivity    (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+    wReflectivity   (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+    SpectrumWidth   (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+    wSpectrumWidth  (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+    AzShear         (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+    wAzShear        (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+    Divergence      (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+    wDivergence     (Altitude, Latitude, Longitude) float32 nan nan ... nan nan
+Attributes: (12/16)
+    Name:                   GridRad
+    Description:            Three-dimensional gridded NEXRAD radar reflectivi...
+    Analysis_time:          2011-04-27 22:00:00Z
+    Analysis_time_window:   all azimuth scans (elevation angles) with central...
+    Algorithm_version:      v4_2
+    Algorithm_description:  Space and time binning weighted by distances from...
+    ...                     ...
+    Storage_scheme:         netCDF-4, sparse
+    Data_source:            Amazon Web Services
+    Data_source_URL:        https://www.ncdc.noaa.gov/data-access/radar-data/...
+    Authors:                Cameron R. Homeyer, School of Meteorology, Univer...
+    Project_sponsor:        National Oceanic and Atmospheric Administration, ...
+    Project_name:           0-3 Hour Tornado Prediction Using the Warn on For...
 >>> gridradpy.plot_image(data, fname='gridrad_image.png')           # Plot a basic image, saving it to gridrad_image.png
 ```
 
