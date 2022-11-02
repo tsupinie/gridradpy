@@ -12,7 +12,7 @@ python setup.py install
 ```
 
 ### Usage
-To use the download script:
+The download script can download a bunch of data files in a given time interval with one script invocation. To use the download script:
 ```
 usage: download_gridrad [-h] --email EMAIL --dt-start DT_START --dt-end DT_END [--td-step TD_STEP] [--out-path OUT_PATH] [--force-download]
 
@@ -27,13 +27,26 @@ options:
 ```
 The download script will prompt for your RDA password when run.
 
-To use the Python processing code:
+To use the Python code:
 ```python
 >>> import gridradpy
->>> data = gridradpy.read_file('/path/to/file.nc')                  # Read the gridrad file and unpack it from the 
+>>> from gridradpy import GridRadDownloader
+>>> from datetime import datetime
+>>>
+>>> grd = GridRadDownloader()
+>>> grd.login('user@example.com')                                   # Login with your RDA email and password (only do
+                                                                    #   this once per script invocation)
+Enter RDA Password:
+>>> local_fname = '/path/to/gridrad/gridrad_v4_2_20110427_2200.nc'
+>>> grd.download_file(datetime(2011, 4, 27, 22, 0), local_fname)    # Download data from 2200 UTC 27 April 2011
+                                                                    #   to the local disk
+>>>
+>>> data = gridradpy.read_file(local_fname)                         # Read the gridrad file and unpack it from the 
                                                                     #   sparse storage scheme
 >>> data = gridradpy.filter(data)                                   # Remove low-confidence data points
 >>> data = gridradpy.remove_clutter(data, skip_weak_ll_echo=True)   # Remove areas of ground clutter
+>>> data = gridradpy.load_and_process_file(local_fname)             # Shorthand that does the same thing the above 3 
+                                                                    #   function calls
 >>> gridradpy.plot_image(data, fname='gridrad_image.png')           # Plot a basic image, saving it to gridrad_image.png
 ```
 
