@@ -1,14 +1,19 @@
-#+
-# Name:
-#		GRIDRAD Python Module
-# Purpose:
-#		This module contains three functions for dealing with Gridded NEXRAD WSR-88D Radar
-#		(GridRad) data: reading (read_file), filtering (filter), and decluttering (remove_clutter).
-# Author and history:
-#		Cameron R. Homeyer  2017-07-03.
-#                         2021-02-23. Updated to be compatible with v4.2 GridRad data and v3 Python.
-#       Tim Supinie 2022-10-28. Updated to use xarray
-#-
+
+from pathlib import Path
+from typing import Union
 
 from .gridrad import read_file, filter, remove_clutter, plot_image
 from .download import GridRadDownloader
+
+_remove_clutter_ = remove_clutter
+
+def load_and_process_file(fname: Union[str, Path], filter_low_confidence=True, remove_clutter=True):
+    ds = read_file(fname)
+    
+    if filter_low_confidence:
+        ds = filter(ds)
+
+    if remove_clutter:
+        ds = _remove_clutter_(ds)
+    
+    return ds
