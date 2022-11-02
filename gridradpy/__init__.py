@@ -14,6 +14,6 @@ def load_and_process_file(fname: Union[str, Path], filter_low_confidence=True, r
         ds = filter(ds)
 
     if remove_clutter:
-        ds = _remove_clutter_(ds)
+        ds = _remove_clutter_(ds, skip_weak_ll_echo=True)
     
     return ds
